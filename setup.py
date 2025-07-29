@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name = "imgcap",
     version = "1.0",
-    packages=["imgcap"],
+    packages=["canopusImgCap"],
     author="Aluisio Leonello Victal",
     author_email = "alvictal@gmail.com",
     description = "v4l2-ctl and imagemagick wrapper ",
