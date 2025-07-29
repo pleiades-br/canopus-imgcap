@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+
+import sys
+import canopusImgCap.imgcap as imgcap
+
+if __name__ == '__main__':
+    sys.exit(imgcap.main())
