@@ -21,7 +21,7 @@ def parse_size(size_arg):
     """Parse size argument"""
     if size_arg.lower() in SIZES:
         return SIZES[size_arg.lower()]
-    
+
     raise ValueError(f"Invalid size format. Use one of {list(SIZES.keys())}  (e.g., 640x480)")
 
 def run_command(cmd, description=""):
@@ -124,11 +124,11 @@ Examples:
 
     parser.add_argument('device', help='Video device path (e.g., /dev/video2)')
     parser.add_argument('--size',type=str, help='Image size (small/medium/large)')
-    parser.add_argument('--filename', type=str, nargs='?', default='frame.png',
+    parser.add_argument('--filename', type=str, default='frame.png',
                        help='Output filename (default: frame.png)')
-    parser.add_argument('--output_dir', type=str, nargs='?', default='.',
+    parser.add_argument('--output_dir', type=str, default='.',
                        help='Output directory (default: current directory)')
-    parser.add_argument('--show_results', type=bool, default=False,
+    parser.add_argument('--show_results', action='store_true',
                         help='Show result in hdmi output')
 
     # Handle case where script is called with sys.argv directly
@@ -156,7 +156,7 @@ Examples:
 
     print(f"Capturing from device: {args.device}")
     print(f"Size: {width}x{height}")
-    print(f"Output: {os.path.join(args.directory, filename)}")
+    print(f"Output: {os.path.join(args.output_dir, filename)}")
     print("-" * 50)
 
     success = capture_frame(args.device,
