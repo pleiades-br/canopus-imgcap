@@ -199,43 +199,43 @@ Examples:
         parser.print_help()
         sys.exit(1)
 
-    try:
+#    try:
 
-        args = parser.parse_args()
+    args = parser.parse_args()
 
-        width, height = capture.get_resolution(args.size)
+    width, height = capture.get_resolution(args.size)
 
-        capture.validate_device(args.device)
+    capture.validate_device(args.device)
 
-        # Ensure filename has .png extension
-        filename = args.filename
-        if not filename.lower().endswith('.png'):
-            filename += '.png'
+    # Ensure filename has .png extension
+    filename = args.filename
+    if not filename.lower().endswith('.png'):
+        filename += '.png'
 
-        print(f"Capturing from device: {args.device}")
-        print(f"Size: {width}x{height}")
-        print(f"Output: {os.path.join(args.output_dir, filename)}")
-        print("-" * 50)
+    print(f"Capturing from device: {args.device}")
+    print(f"Size: {width}x{height}")
+    print(f"Output: {os.path.join(args.output_dir, filename)}")
+    print("-" * 50)
 
-        success = capture.capture_frame(args.device,
-                                width,
-                                height,
-                                args.output_dir,
-                                filename,
-                                args.show_results)
-        if success:
-            print("Capture completed successfully!")
-            sys.exit(0)
-        else:
-            print("Capture failed!")
-            sys.exit(1)
-
-    except KeyboardInterrupt:
-        print("\n\nOperation cancelled by user")
+    success = capture.capture_frame(args.device,
+                            width,
+                            height,
+                            args.output_dir,
+                            filename,
+                            args.show_results)
+    if success:
+        print("Capture completed successfully!")
         sys.exit(0)
-    except Exception as e:
-        print(f"\n✗ Unexpected error: {e}")
+    else:
+        print("Capture failed!")
         sys.exit(1)
+
+#    except KeyboardInterrupt:
+#        print("\n\nOperation cancelled by user")
+#        sys.exit(0)
+#    except Exception as e:
+#        print(f"\n✗ Unexpected error: {e}")
+#        sys.exit(1)
 
 if __name__ == '__main__':
     main()
