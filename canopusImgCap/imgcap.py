@@ -63,8 +63,8 @@ class ImageCapture:
         """Parse size argument"""
 
         size_map = {
-            'small': '640x480',
-            'large': '1920x1080'
+            'small': (640,480),
+            'large': (1920,1080)
         }
         if size_arg.lower() in size_map:
             return size_map[size_arg.lower()]
@@ -166,7 +166,7 @@ def main():
     """Main function"""
     # Create capture instance
     capture = ImageCapture()
-    
+
     # Set up signal handlers for graceful shutdown
     capture.setup_signal_handlers()
 
