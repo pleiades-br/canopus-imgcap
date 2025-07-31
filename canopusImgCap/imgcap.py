@@ -110,7 +110,7 @@ class ImageCapture:
                 return False
 
             cmd2 = [
-                'v4l2-ctl'
+                'v4l2-ctl',
                 '--device', device,
                 '-c',
                 'alpha_component=128'
