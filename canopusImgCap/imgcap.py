@@ -109,15 +109,15 @@ class ImageCapture:
             if not self.run_command(cmd1, "setting video format"):
                 return False
 
-            cmd2 = [
-                'v4l2-ctl',
-                '--device', device,
-                '-c',
-                'alpha_component=128'
-            ]
+#            cmd2 = [
+#                'v4l2-ctl',
+#                '--device', device,
+#                '-c',
+#                'alpha_component=128'
+#            ]
 
-            if not self.run_command(cmd2, "setting video format"):
-                return False
+#            if not self.run_command(cmd2, "setting video format"):
+#                return False
 
             # Step 2: Capture raw frame
             cmd3 = [
