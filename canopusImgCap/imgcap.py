@@ -95,24 +95,19 @@ class ImageCapture:
         try:
             # Step 1: Get the image
             cmd1 = [
-                'gst-launch-1.0',
-                'v4l2src',
-                f'device={device}',
-                '!',
-                f'\'video/x-raw, width={width}, height={height},\'',
-                '!',
-                'videoconvert',
-                '!',
-                'autovideosink','sync=false'
+                f'gst-launch-1.0 v4l2src device={device} '
+                f'! video/x-raw,width={width},height={height},format=YUYV '
+                f'! videoconvert '
+                f'! autovideosink sync=false'
             ]
 
             if not self.run_command(cmd1, "Geeting command"):
                 return False
-            
+
             return True
         finally:
             pass
-        
+
     def capture_frame(self, device, width, height, output_dir, filename, show_results):
         """Capture a frame using v4l2-ctl and convert it to PNG"""
 
@@ -127,12 +122,12 @@ class ImageCapture:
             # Step 1: Get the image
             cmd1 = [
                 'ffmpeg',
-                '-f','v4l2',
+                '-f', 'v4l2',
                 '-input_format', 'yuyv422',
-                '-video_size',f'{width}x{height}',
+                '-video_size', f'{width}x{height}',
                 '-i', device,
-                '-vframes', '1'
-                '-vf', '\"select=gte(n\,14)\"',
+                '-vframes', '1',               
+                '-vf', 'select=gte(n\\,14)',
                 temp_raw_path
             ]
 
@@ -189,7 +184,7 @@ Examples:
 
     parser.add_argument('device', help='Video device path (e.g., /dev/video2)')
     parser.add_argument('--size',type=str, help='Image size (small/large)')
-    parser.add_argument('--video',action='video_true', 
+    parser.add_argument('--video',action='store_true',
                         help='streaming video through hdmi, all other options will be ignored')
     parser.add_argument('--filename', type=str, default='frame.png',
                        help='Output filename (default: frame.png)')
@@ -221,7 +216,7 @@ Examples:
     print(f"Output: {os.path.join(args.output_dir, filename)}")
     print("-" * 50)
 
-    if args.video_true == True: 
+    if args.video is True:
         success = capture.video(args.device,
                                 width,
                                 height)
