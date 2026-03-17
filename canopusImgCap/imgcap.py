@@ -121,7 +121,7 @@ class ImageCapture:
         try:
             # Step 1: Get the image
             cmd1 = [
-                'ffmpeg',
+                'ffmpeg','-y'
                 '-f', 'v4l2',
                 '-input_format', 'yuyv422',
                 '-video_size', f'{width}x{height}',
