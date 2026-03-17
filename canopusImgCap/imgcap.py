@@ -13,6 +13,8 @@ import signal
 
 
 class ImageCapture:
+    """_summary_
+    """
     def __init__(self):
         self.interrupted = False
 
@@ -88,6 +90,29 @@ class ImageCapture:
             print(f"Command not found: {cmd[0]}. Make sure it's installed and in PATH.")
             return False
 
+    def video(self, device, width, height):
+        """Show video on the hdmi output"""
+        try:
+            # Step 1: Get the image
+            cmd1 = [
+                'gst-launch-1.0',
+                'v4l2src',
+                f'device={device}',
+                '!',
+                f'\'video/x-raw, width={width}, height={height},\'',
+                '!',
+                'videoconvert',
+                '!',
+                'autovideosink','sync=false'
+            ]
+
+            if not self.run_command(cmd1, "Geeting command"):
+                return False
+            
+            return True
+        finally:
+            pass
+        
     def capture_frame(self, device, width, height, output_dir, filename, show_results):
         """Capture a frame using v4l2-ctl and convert it to PNG"""
 
@@ -95,53 +120,30 @@ class ImageCapture:
         os.makedirs(output_dir, exist_ok=True)
 
         # Use temporary file for raw frame data
-        with tempfile.NamedTemporaryFile(suffix='.raw', delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
             temp_raw_path = temp_file.name
 
         try:
-            # Step 1: Set video format
+            # Step 1: Get the image
             cmd1 = [
-                'v4l2-ctl',
-                '--device', device,
-                f'--set-fmt-video=width={width},height={height},pixelformat=RGGB'
+                'ffmpeg',
+                '-f','v4l2',
+                '-input_format', 'yuyv422',
+                '-video_size',f'{width}x{height}',
+                '-i', device,
+                '-vframes', '1'
+                '-vf', '\"select=gte(n\,14)\"',
+                temp_raw_path
             ]
 
-            if not self.run_command(cmd1, "setting video format"):
+            if not self.run_command(cmd1, "Geeting command"):
                 return False
 
-#            cmd2 = [
-#                'v4l2-ctl',
-#                '--device', device,
-#                '-c',
-#                'alpha_component=128'
-#            ]
-
-#            if not self.run_command(cmd2, "setting video format"):
-#                return False
-
-            # Step 2: Capture raw frame
-            cmd3 = [
-                'v4l2-ctl',
-                '--device', device,
-                '--stream-mmap',
-                f'--stream-to={temp_raw_path}',
-                '--stream-count=1'
-            ]
-
-            if not self.run_command(cmd3, "capturing frame"):
-                return False
-
-            # Step 3: Convert raw frame to PNG
+            # Step 2: Moving to actual path
             final_path = os.path.join(output_dir, filename)
-            cmd4 = [
-                'convert',
-                '-size', f'{width}x{height}',
-                '-depth', '8',
-                f'gray:{temp_raw_path}',
-                final_path
-            ]
+            cmd2 = ['mv', temp_raw_path, final_path]
 
-            if not self.run_command(cmd4, "converting to PNG"):
+            if not self.run_command(cmd2, f'Not able to move file {temp_raw_path} to {final_path}'):
                 return False
 
             print(f"Successfully saved image to: {final_path}")
@@ -179,14 +181,16 @@ Size options:
   large   - 1920x1080
 
 Examples:
-  imgcap /dev/video2 --size medium
+  imgcap /dev/video2 --size small
   imgcap /dev/video2 --size large --filename my_photo.png --output_dir /home/user/photos
   imgcap /dev/video3 --size large --filename custom_name.png 
         """
     )
 
     parser.add_argument('device', help='Video device path (e.g., /dev/video2)')
-    parser.add_argument('--size',type=str, help='Image size (small/medium/large)')
+    parser.add_argument('--size',type=str, help='Image size (small/large)')
+    parser.add_argument('--video',action='video_true', 
+                        help='streaming video through hdmi, all other options will be ignored')
     parser.add_argument('--filename', type=str, default='frame.png',
                        help='Output filename (default: frame.png)')
     parser.add_argument('--output_dir', type=str, default='.',
@@ -217,12 +221,17 @@ Examples:
     print(f"Output: {os.path.join(args.output_dir, filename)}")
     print("-" * 50)
 
-    success = capture.capture_frame(args.device,
-                            width,
-                            height,
-                            args.output_dir,
-                            filename,
-                            args.show_results)
+    if args.video_true == True: 
+        success = capture.video(args.device,
+                                width,
+                                height)
+    else:
+        success = capture.capture_frame(args.device,
+                                width,
+                                height,
+                                args.output_dir,
+                                filename,
+                                args.show_results)
     if success:
         print("Capture completed successfully!")
         sys.exit(0)
