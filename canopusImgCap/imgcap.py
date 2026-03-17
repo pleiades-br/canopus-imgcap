@@ -73,11 +73,11 @@ class ImageCapture:
 
         raise ValueError(f"Invalid size format. Use one of {list(size_map.keys())}  (e.g., 640x480)")
 
-    def run_command(self, cmd, description=""):
+    def run_command(self, cmd, description="", shell_state=False):
         """Run a shell command and handle errors"""
         print(f"Running: {' '.join(cmd)}")
         try:
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True, shell=shell_state)
             if result.stdout:
                 print(f"Output: {result.stdout.strip()}")
             return True
@@ -96,12 +96,12 @@ class ImageCapture:
             # Step 1: Get the image
             cmd1 = [
                 f'gst-launch-1.0 v4l2src device={device} '
-                f'! video/x-raw,width={width},height={height},format=YUYV '
+                f'! \'video/x-raw,width={width},height={height}\' '
                 f'! videoconvert '
                 f'! autovideosink sync=false'
             ]
 
-            if not self.run_command(cmd1, "Geeting command"):
+            if not self.run_command(cmd1, "Geeting command", shell_state=True):
                 return False
 
             return True
